@@ -1,62 +1,15 @@
-Write-Host "--- Porteus & qBittorrent Generator ---" -ForegroundColor Cyan
+Co teď uvidíš v Porteusu?
 
-# 1. Zjištění identity a disku
-$winUser = $env:USERNAME
-$winDrive = Get-Partition | Where-Object { $_.DriveLetter -eq 'C' }
-$linuxDevice = if ((Get-Disk -Number $winDrive.DiskNumber).BusType -eq 'NVMe') { "nvme0n1p" } else { "sda" }
-$finalDev = "/dev/$($linuxDevice)$($winDrive.PartitionNumber)"
+Po spuštění skriptu rc.local (příkazem su a pak /etc/rc.d/rc.local) se stane toto:
 
-# 2. Cesty pro Porteus (rootcopy)
-$basePath = "C:\porteus\porteus\rootcopy"
-$rcPath = "$basePath\etc\rc.d"
-$qbConfPath = "$basePath\home\guest\.config\qBittorrent"
-if (!(Test-Path $rcPath)) { New-Item -ItemType Directory -Force -Path $rcPath }
-if (!(Test-Path $qbConfPath)) { New-Item -ItemType Directory -Force -Path $qbConfPath }
+    Plocha: Uvidíš své ikony a soubory z Windows plochy přímo na ploše Linuxu.
 
-# 3. Kopírování nastavení qBittorrentu z Windows do Porteusu
-Write-Host "Kopíruji nastavení qBittorrentu..." -ForegroundColor Yellow
-$winQB = "$env:APPDATA\qBittorrent"
-if (Test-Path $winQB) {
-    Copy-Item "$winQB\*" $qbConfPath -Recurse -Force
-}
+    qBittorrent: Sám se spustí a díky prolinkování složek můžeš ukládat přímo do "Stažených souborů", které uvidíš i po návratu do Windows.
 
-# 4. GENEROVÁNÍ LINUX SKRIPTU (rc.local)
-$linuxScript = @"
-#!/bin/bash
-# --- ČÁST PRO LINUX (Automaticky spouštěno Porteusem) ---
+    Kodi & VLC: Budou mít okamžitý přístup k tvým filmům v /mnt/win_c/Users/$winUser/Videos.
 
-# Připojení Windows disku
-mkdir -p /mnt/win_c
-mount -t ntfs-3g -o uid=1000,gid=1000,dmask=022,fmask=133 $finalDev /mnt/win_c
+    Double Commander: Spustíš ho z menu a uvidíš v něm dva panely – v jednom můžeš mít Linux a v druhém Windows disk pro snadné kopírování.
 
-# Propojení uživatelských složek
-USER_HOME="/home/guest"
-WIN_PATH="/mnt/win_c/Users/$winUser"
+Důležitá poznámka k "Nerozbitnosti":
 
-rm -rf `$USER_HOME/Downloads `$USER_HOME/Desktop `$USER_HOME/Documents
-ln -s "`$WIN_PATH/Downloads" `$USER_HOME/Downloads
-ln -s "`$WIN_PATH/Desktop"   `$USER_HOME/Desktop
-ln -s "`$WIN_PATH/Documents" `$USER_HOME/Documents
-
-# Oprava práv pro qBittorrent konfigy
-chown -R guest:guest `$USER_HOME/.config
-
-# Automatický start qBittorrentu pod uživatelem guest
-export DISPLAY=:0
-su guest -c "qbittorrent &"
-"@
-
-$linuxScript | Out-File -FilePath "$rcPath\rc.local" -Encoding ascii
-
-Write-Host "Hotovo! Vypni Fast Boot a restartuj do Porteusu." -ForegroundColor Green
-
-
-##########################################################
-
-
-Po spusteni porteus 
-
-zadat su
-# heslo je: toor
-chmod +x /etc/rc.d/rc.local
-/etc/rc.d/rc.local
+Všechny ty .xzm soubory, co jsi teď stáhl, Porteus při startu načte do RAM. Pokud by se stalo, že Porteus po přidání nějakého modulu nenaběhne, stačí se vrátit do Windows a ten poslední přidaný .xzm ze složky modules smazat. To je ta největší krása Porteusu – systém nelze "rozbít" trvale.
