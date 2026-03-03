@@ -1,3 +1,11 @@
+Porteus LINUX
+
+#############################
+
+#    https://forum.porteus.org/viewtopic.php?t=8877
+
+
+
 su
 # heslo je: toor
 chmod +x /etc/rc.d/rc.local
