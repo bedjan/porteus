@@ -1,38 +1,27 @@
-Write-Host "--- Oprava stahování modulů Porteus ---" -ForegroundColor Cyan
+# 1. Cesty
+$base = "C:\porteus\porteus"
+$rcDir = "$base\rootcopy\etc\rc.d"
+if (!(Test-Path $rcDir)) { New-Item -ItemType Directory -Force -Path $rcDir }
 
-# 1. VYNUCENÍ PROTOKOLU (Důležité pro stahování z webu)
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+# 2. Skript pro ČEŠTINU a PROPOJENÍ (rc.local)
+$linuxScript = @"
+#!/bin/bash
+loadkeys cz
+localectl set-x11-keymap cz
+export LANG=cs_CZ.UTF-8
 
-# 2. Nastavení složky
-$modulesDir = "C:\porteus\porteus\modules"
-if (!(Test-Path $modulesDir)) { New-Item -ItemType Directory -Force -Path $modulesDir }
+# Pripojeni Windows disku
+mkdir -p /mnt/win_c
+mount -t ntfs-3g -o uid=1000,gid=1000 /dev/sda2 /mnt/win_c 2>/dev/null || mount -t ntfs-3g -o uid=1000,gid=1000 /dev/nvme0n1p3 /mnt/win_c
 
-# 3. Aktualizované odkazy (přesné verze z v5.0 repozitáře)
-$baseUrl = "http://dl.porteus.org/x86_64/Porteus-v5.0/modules"
-$downloads = @{
-    "qBittorrent" = "$baseUrl/apps/qbittorrent-4.4.2-x86_64-1.xzm"
-    "LibTorrent"  = "$baseUrl/apps/libtorrent-rasterbar-1.2.15-x86_64-1.xzm"
-    "Kodi"        = "$baseUrl/apps/kodi-19.4-x86_64-1.xzm"
-    "Chrome"      = "$baseUrl/browsers/google-chrome-101.0.4951.54-x86_64-1.xzm"
-    "VLC"         = "$baseUrl/apps/vlc-3.0.17.4-x86_64-1.xzm"
-}
+# Propojeni plochy
+W_PATH="/mnt/win_c/Users/$env:USERNAME"
+for d in Desktop Downloads Documents; do
+    rm -rf /home/guest/`$d
+    ln -s "`$W_PATH/`$d" /home/guest/`$d
+done
+chown -R guest:guest /home/guest
+"@
 
-# 4. Spuštění stahování s viditelným průběhem
-foreach ($item in $downloads.GetEnumerator()) {
-    $fileName = Split-Path $item.Value -Leaf
-    $destFile = Join-Path $modulesDir $fileName
-    
-    Write-Host "Pokouším se stáhnout: $($item.Key)..." -ForegroundColor Yellow
-    try {
-        # Používáme WebClient, který je někdy spolehlivější než Invoke-WebRequest
-        $client = New-Object System.Net.WebClient
-        $client.DownloadFile($item.Value, $destFile)
-        Write-Host "ÚSPĚCH: $($fileName) stažen." -ForegroundColor Green
-    } catch {
-        Write-Host "CHYBA: Nelze stáhnout $($item.Key). Odkaz na serveru se pravděpodobně změnil." -ForegroundColor Red
-        Write-Host "Zkus to prosím ručně zde: $baseUrl" -ForegroundColor White
-    }
-}
-
-# Otevře složku pro kontrolu
-explorer $modulesDir
+$linuxScript | Out-File -FilePath "$rcDir\rc.local" -Encoding ascii
+Write-Host "Příprava hotova! Teď restartuj do Porteusu." -ForegroundColor Green
