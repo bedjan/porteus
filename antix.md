@@ -18,6 +18,8 @@ initrd /antix/antiX/initrd.gz
 
 ###########################################
 
+sudo sh /media/sdb1/antix/antix.sh
+
 
 #!/bin/bash
 
