@@ -12,7 +12,8 @@ insmod ext2
 
 search --no-floppy --file --set=root /antix/antiX/vmlinuz
 
-linux /antix/antiX/vmlinuz bdir=antix/antiX toram persist_all disable=f quiet
+linux /antix/antiX/vmlinuz bdir=antix/antiX toram persist_all quiet
+
 initrd /antix/antiX/initrd.gz
 
 ###########################################
