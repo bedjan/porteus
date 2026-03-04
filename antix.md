@@ -16,6 +16,18 @@ linux /antix/antiX/vmlinuz bdir=antiX from=hd toram persist_all quiet
 
 initrd /antix/antiX/initrd.gz
 
+#############################################
+
+insmod part_gpt
+insmod part_msdos
+insmod ext2
+
+search --no-floppy --file --set=root /antix/antiX/vmlinuz
+
+linux /antix/antiX/vmlinuz bdir=antix/antiX buuid=BC57DE46-26AB-DC01-3041-DE4626ABDC01 from=hd toram persist_all
+
+initrd /antix/antiX/initrd.gz
+
 ###########################################
 
 sudo sh /media/sdb1/antix/antix.sh
