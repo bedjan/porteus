@@ -12,7 +12,7 @@ insmod ext2
 
 search --no-floppy --label --set=root Porteus
 
-linux /antix/antiX/vmlinuz bdir=antix/antiX blabel=Porteus from=hd toram persist_all
+linux /antix/antiX/vmlinuz bdir=/antix/antiX blabel=Porteus from=hd toram persist_all
 
 initrd /antix/antiX/initrd.gz
 
