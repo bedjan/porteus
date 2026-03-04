@@ -6,13 +6,13 @@ Gru2Win, Ext2volume manager, Diusklinternal linux reader, antix 64 bit full iso
 Grub2Wim:
 
 
-nsmod part_gpt
+insmod part_gpt
 insmod part_msdos
 insmod ext2
 
-search --no-floppy --file --set=root /antix/antiX/vmlinuz
+search --no-floppy --label --set=root Porteus
 
-linux /antix/antiX/vmlinuz bdir=antiX from=hd toram persist_all quiet
+linux /antix/antiX/vmlinuz bdir=antix/antiX blabel=Porteus from=hd toram persist_all
 
 initrd /antix/antiX/initrd.gz
 
