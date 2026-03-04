@@ -5,11 +5,11 @@ Gru2Win, Ext2volume manager, Diusklinternal linux reader, antix 64 bit full iso
 
 Grub2Wim:
 
-search --no-floppy --file --set=root /antix/antix/boot/vmlinuz
+search --no-floppy --file --set=root /antix/antiX/vmlinuz
 
-linux /antix/antix/boot/vmlinuz bdir=antix/antix toram persist_all disable=f quiet
+linux /antix/antiX/vmlinuz bdir=antix/antiX toram persist_all disable=f quiet
 
-initrd /antix/antix/boot/initrd.gz
+initrd /antix/antiX/initrd.gz
 
 ###########################################
 
